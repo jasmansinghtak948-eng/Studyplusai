@@ -258,3 +258,21 @@
         align-items: center;
     }
 }
+/* Make cards clickable */
+.link-card {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Hover effect = tells user this is MAIN */
+.link-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 45px rgba(0,0,0,0.15);
+}
+
+/* Disable fake buttons look */
+.fake-box button {
+    cursor: not-allowed;
+}
