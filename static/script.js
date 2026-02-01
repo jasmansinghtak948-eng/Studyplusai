@@ -65,11 +65,11 @@ function loadPlans() {
                 <div class="plan-item ${plan.completed ? 'completed' : ''}">
                     <div class="plan-info">
                         <div class="subject">${escapeHtml(plan.subject)}</div>
-                        <div class="meta">ð ${plan.date} | â±ï¸ ${plan.hours}h</div>
+                        <div class="meta">📅 ${plan.date} | ⏱️ ${plan.hours}h</div>
                     </div>
                     <div class="plan-actions">
                         <button class="btn-done" onclick="toggleComplete(${index})">
-                            ${plan.completed ? 'â' : 'Done'}
+                            ${plan.completed ? '✓' : 'Done'}
                         </button>
                         <button class="btn-delete" onclick="deletePlan(${index})">Delete</button>
                     </div>
@@ -124,9 +124,9 @@ function analyze() {
         const resultDiv = document.getElementById("result");
         resultDiv.innerHTML = `
             <div>
-                â±ï¸ <strong>${data.hours} hours</strong><br>
-                ð <strong>Focus: ${data.focus}%</strong><br><br>
-                ð¤ <strong>${data.tip}</strong>
+                ⏱️ <strong>${data.hours} hours</strong><br>
+                📊 <strong>Focus: ${data.focus}%</strong><br><br>
+                🤖 <strong>${data.tip}</strong>
             </div>
         `;
 

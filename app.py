@@ -3,13 +3,7 @@ import json
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-app = Flask(
-    __name__,
-    template_folder=os.path.join(BASE_DIR, "templates"),
-    static_folder=os.path.join(BASE_DIR, "static")
-)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 CORS(app)
 
 PLANS_FILE = "study_plans.json"
