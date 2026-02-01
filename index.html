@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Study Plus AI</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6366f1">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">📚 Study Plus AI</div>
+  <div class="nav-links">
+    <a onclick="scrollTo('planner')">Planner</a>
+    <a onclick="scrollTo('analyzer')">Analyzer</a>
+    <button class="share-btn" onclick="shareApp()">Share</button>
+  </div>
+</nav>
+
+<section id="planner" class="section">
+  <h2>📅 Study Planner</h2>
+  <div class="form-container">
+    <input id="subject" type="text" placeholder="Subject" required>
+    <input id="hours" type="number" step="0.5" placeholder="Hours" min="0.5" required>
+    <input id="date" type="date" required>
+    <button onclick="addPlan()" class="btn">+ Add Plan</button>
+  </div>
+  <div id="plansList" class="plans-list"></div>
+</section>
+
+<section id="analyzer" class="section">
+  <h2>📊 Study Analyzer</h2>
+  <div class="form-container">
+    <input id="analyzeHours" type="number" step="0.1" placeholder="Total hours" min="0" required>
+    <button onclick="analyze()" class="btn">Analyze</button>
+  </div>
+  <div id="result" class="result"></div>
+  <canvas id="chart"></canvas>
+</section>
+
+<div id="shareModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span onclick="closeShare()" style="cursor:pointer;float:right;font-size:24px;">✕</span>
+    <h2>Share Study Plus AI</h2>
+    <input id="shareLink" type="text" readonly>
+    <button onclick="copyLink()" class="btn">Copy Link</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/script.js"></script>
+</body>
+</html>
