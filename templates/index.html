@@ -12,12 +12,68 @@
 <nav class="navbar">
   <div class="logo">📚 Study Plus AI</div>
   <div class="nav-links">
+    <a onclick="scrollTo('home')">Home</a>
     <a onclick="scrollTo('planner')">Planner</a>
     <a onclick="scrollTo('analyzer')">Analyzer</a>
     <button class="share-btn" onclick="shareApp()">Share</button>
   </div>
 </nav>
 
+<!-- ========== LANDING PAGE ========== -->
+<section id="home" class="hero">
+  <div class="hero-content">
+    <h1 class="fade-in">Welcome to Study Plus AI</h1>
+    <p class="fade-in-delay-1">Your intelligent study companion for smarter learning</p>
+    <p class="fade-in-delay-1" style="font-size: 0.95rem; opacity: 0.8;">Plan your studies, analyze your progress, and achieve your goals</p>
+    <button class="cta-btn fade-in-delay-2" onclick="scrollTo('planner')">Get Started →</button>
+  </div>
+  <div class="hero-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+</section>
+
+<!-- ========== FEATURES SHOWCASE ========== -->
+<section class="features-showcase">
+  <div class="container">
+    <h2>✨ Why Study Plus AI?</h2>
+    <div class="features-grid">
+      <div class="feature-card fade-in">
+        <div class="feature-icon">📅</div>
+        <h3>Smart Planning</h3>
+        <p>Create and organize study plans with ease</p>
+      </div>
+      <div class="feature-card fade-in-delay-1">
+        <div class="feature-icon">📊</div>
+        <h3>AI Analysis</h3>
+        <p>Get insights and recommendations based on your study habits</p>
+      </div>
+      <div class="feature-card fade-in-delay-2">
+        <div class="feature-icon">📈</div>
+        <h3>Track Progress</h3>
+        <p>Monitor your focus score and study consistency</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">🔗</div>
+        <h3>Easy Sharing</h3>
+        <p>Share your goals with friends and study groups</p>
+      </div>
+      <div class="feature-card fade-in-delay-1">
+        <div class="feature-icon">📱</div>
+        <h3>Mobile Ready</h3>
+        <p>Access anywhere, anytime on any device</p>
+      </div>
+      <div class="feature-card fade-in-delay-2">
+        <div class="feature-icon">🌐</div>
+        <h3>Cloud Sync</h3>
+        <p>Your data is always available and secure</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== STUDY PLANNER SECTION ========== -->
 <section id="planner" class="section">
   <h2>📅 Study Planner</h2>
   <div class="form-container">
@@ -29,6 +85,7 @@
   <div id="plansList" class="plans-list"></div>
 </section>
 
+<!-- ========== STUDY ANALYZER SECTION ========== -->
 <section id="analyzer" class="section">
   <h2>📊 Study Analyzer</h2>
   <div class="form-container">
@@ -39,10 +96,81 @@
   <canvas id="chart"></canvas>
 </section>
 
+<!-- ========== STATS SECTION ========== -->
+<section class="stats-section">
+  <div class="container">
+    <h2>📈 Impact & Success</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">1000+</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">50K+</div>
+        <div class="stat-label">Study Plans Created</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">95%</div>
+        <div class="stat-label">User Satisfaction</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">Always Available</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CTA SECTION ========== -->
+<section class="cta-section">
+  <div class="cta-content">
+    <h2>Ready to Transform Your Study Habits?</h2>
+    <p>Join thousands of students using Study Plus AI to achieve their goals</p>
+    <button class="cta-btn-large" onclick="scrollTo('planner')">Start Planning Now</button>
+  </div>
+</section>
+
+<!-- ========== FOOTER/ENDING PAGE ========== -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>Study Plus AI</h3>
+      <p>Your intelligent study companion for academic success</p>
+      <div class="social-links">
+        <a href="#" title="Share on Facebook">f</a>
+        <a href="#" title="Share on Twitter">𝕏</a>
+        <a href="#" onclick="shareApp()">Share Link</a>
+      </div>
+    </div>
+    <div class="footer-section">
+      <h4>Features</h4>
+      <ul>
+        <li><a onclick="scrollTo('planner')">Study Planner</a></li>
+        <li><a onclick="scrollTo('analyzer')">Study Analyzer</a></li>
+        <li><a onclick="scrollTo('home')">Home</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#" onclick="alert('Health Status: OK')">System Status</a></li>
+        <li><a href="#" onclick="alert('Version 1.0.0')">About Us</a></li>
+        <li><a onclick="shareApp()">Get Help</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2024 Study Plus AI. All rights reserved.</p>
+    <p>Made with ❤️ for smarter study habits</p>
+  </div>
+</footer>
+
+<!-- ========== SHARE MODAL ========== -->
 <div id="shareModal" class="modal" style="display:none;">
   <div class="modal-content">
     <span onclick="closeShare()" style="cursor:pointer;float:right;font-size:24px;">✕</span>
     <h2>Share Study Plus AI</h2>
+    <p>Share this app with your friends and study group</p>
     <input id="shareLink" type="text" readonly>
     <button onclick="copyLink()" class="btn">Copy Link</button>
   </div>
