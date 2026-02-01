@@ -1,0 +1,207 @@
+let chart = null;
+
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("App initializing...");
+    loadPlans();
+});
+
+function scrollTo(id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function addPlan() {
+    const subject = document.getElementById("subject").value.trim();
+    const hours = document.getElementById("hours").value.trim();
+    const date = document.getElementById("date").value.trim();
+
+    if (!subject || !hours || !date) {
+        alert("Please fill in all fields");
+        return;
+    }
+
+    const payload = {
+        subject: subject,
+        hours: parseFloat(hours),
+        date: date
+    };
+
+    fetch("/api/plans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById("subject").value = "";
+            document.getElementById("hours").value = "";
+            document.getElementById("date").value = "";
+            loadPlans();
+        } else {
+            alert("Error adding plan: " + (data.error || "Unknown error"));
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error adding plan");
+    });
+}
+
+function loadPlans() {
+    fetch("/api/plans")
+        .then(response => response.json())
+        .then(plans => {
+            const listElement = document.getElementById("plansList");
+            
+            if (!plans || plans.length === 0) {
+                listElement.innerHTML = '<p style="text-align:center;color:#999;">No plans yet. Create one above!</p>';
+                return;
+            }
+
+            listElement.innerHTML = plans.map((plan, index) => `
+                <div class="plan-item ${plan.completed ? 'completed' : ''}">
+                    <div class="plan-info">
+                        <div class="subject">${escapeHtml(plan.subject)}</div>
+                        <div class="meta">ð ${plan.date} | â±ï¸ ${plan.hours}h</div>
+                    </div>
+                    <div class="plan-actions">
+                        <button class="btn-done" onclick="toggleComplete(${index})">
+                            ${plan.completed ? 'â' : 'Done'}
+                        </button>
+                        <button class="btn-delete" onclick="deletePlan(${index})">Delete</button>
+                    </div>
+                </div>
+            `).join("");
+        })
+        .catch(error => {
+            console.error("Error loading plans:", error);
+        });
+}
+
+function toggleComplete(id) {
+    fetch(`/api/plans/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed: true })
+    })
+    .then(response => response.json())
+    .then(() => loadPlans())
+    .catch(error => console.error("Error:", error));
+}
+
+function deletePlan(id) {
+    if (confirm("Delete this plan?")) {
+        fetch(`/api/plans/${id}`, { method: "DELETE" })
+            .then(response => response.json())
+            .then(() => loadPlans())
+            .catch(error => console.error("Error:", error));
+    }
+}
+
+function analyze() {
+    const hoursInput = document.getElementById("analyzeHours").value.trim();
+    
+    if (!hoursInput || parseFloat(hoursInput) <= 0) {
+        alert("Please enter valid hours");
+        return;
+    }
+
+    fetch("/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hours: parseFloat(hoursInput) })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("Error: " + data.error);
+            return;
+        }
+
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = `
+            <div>
+                â±ï¸ <strong>${data.hours} hours</strong><br>
+                ð <strong>Focus: ${data.focus}%</strong><br><br>
+                ð¤ <strong>${data.tip}</strong>
+            </div>
+        `;
+
+        const chartCanvas = document.getElementById("chart");
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new Chart(chartCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Focus Score", "Remaining"],
+                datasets: [{
+                    data: [data.focus, 100 - data.focus],
+                    backgroundColor: ["#6366f1", "#e5e7eb"],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error analyzing hours");
+    });
+}
+
+function shareApp() {
+    const modal = document.getElementById("shareModal");
+    const shareLink = document.getElementById("shareLink");
+    
+    if (modal && shareLink) {
+        shareLink.value = window.location.href;
+        modal.style.display = "flex";
+    }
+}
+
+function closeShare() {
+    const modal = document.getElementById("shareModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+function copyLink() {
+    const shareLink = document.getElementById("shareLink");
+    
+    if (shareLink) {
+        shareLink.select();
+        try {
+            document.execCommand("copy");
+            alert("Link copied to clipboard!");
+        } catch (err) {
+            console.error("Copy failed:", err);
+        }
+    }
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById("shareModal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+};
+
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
