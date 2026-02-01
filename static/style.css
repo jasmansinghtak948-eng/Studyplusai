@@ -264,26 +264,127 @@ canvas {
   transform: translateY(0);
 }
 
-/* ========== FEATURES SECTION ========== */
-.features-grid {
+/* ========== HERO SECTION (LANDING PAGE) ========== */
+.hero {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  text-align: center;
+  z-index: 10;
+  color: white;
+  max-width: 600px;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.3rem;
+  margin-bottom: 30px;
+  opacity: 0.95;
+}
+
+.cta-btn {
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 50px;
+  background: white;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.hero-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.shape {
+  position: absolute;
+  opacity: 0.1;
+  border-radius: 50%;
+}
+
+.shape-1 {
+  width: 400px;
+  height: 400px;
+  background: white;
+  top: -100px;
+  right: -100px;
+}
+
+.shape-2 {
+  width: 300px;
+  height: 300px;
+  background: white;
+  bottom: 50px;
+  left: 10%;
+}
+
+.shape-3 {
+  width: 200px;
+  height: 200px;
+  background: white;
+  top: 50%;
+  right: 5%;
+}
+
+/* ========== FEATURES SHOWCASE ========== */
+.features-showcase {
+  padding: 80px 20px;
+  background: var(--light);
+}
+
+.features-showcase h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 50px;
+  color: var(--dark);
+}
+
+.features-showcase .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 30px;
-  margin-top: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.feature-card {
-  text-align: center;
-  padding: 30px;
+.features-showcase .feature-card {
   background: white;
+  padding: 30px;
   border-radius: 15px;
   border: 1px solid var(--border);
+  text-align: center;
   transition: all 0.3s;
 }
 
-.feature-card:hover {
+.features-showcase .feature-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
   border-color: var(--primary);
 }
 
@@ -292,23 +393,181 @@ canvas {
   margin-bottom: 15px;
 }
 
-.feature-card h3 {
+.features-showcase .feature-card h3 {
+  color: var(--dark);
   margin-bottom: 10px;
+}
+
+.features-showcase .feature-card p {
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ========== STATS SECTION ========== */
+.stats-section {
+  padding: 80px 20px;
+  background: white;
+}
+
+.stats-section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 50px;
   color: var(--dark);
 }
 
-.feature-card p {
-  color: var(--text);
-  line-height: 1.6;
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 50px rgba(99, 102, 241, 0.3);
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* ========== CTA SECTION ========== */
+.cta-section {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  text-align: center;
+  color: white;
+}
+
+.cta-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cta-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.cta-content p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  opacity: 0.95;
+}
+
+.cta-btn-large {
+  padding: 15px 50px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 50px;
+  background: white;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.cta-btn-large:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* ========== FOOTER ========== */
 .footer {
   background: var(--dark);
   color: white;
+  padding: 60px 20px 30px;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+}
+
+.footer-section h3,
+.footer-section h4 {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.footer-section p {
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li {
+  margin-bottom: 10px;
+}
+
+.footer-section a {
+  color: white;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  cursor: pointer;
+}
+
+.footer-section a:hover {
+  opacity: 1;
+}
+
+.social-links {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.social-links a:hover {
+  background: var(--primary);
+  opacity: 1;
+}
+
+.footer-bottom {
   text-align: center;
-  padding: 30px;
-  margin-top: 80px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 30px;
+  opacity: 0.8;
+}
+
+.footer-bottom p {
+  margin: 5px 0;
 }
 
 /* ========== MODAL ========== */
@@ -451,6 +710,24 @@ canvas {
 
   .section h2 {
     font-size: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero p {
+    font-size: 1.05rem;
+  }
+
+  .stats-section h2,
+  .cta-section h2,
+  .features-showcase h2 {
+    font-size: 2rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
   }
 }
 
