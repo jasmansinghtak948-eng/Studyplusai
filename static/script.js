@@ -205,3 +205,137 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+/* ========== Jas AI Assistant JS ========== */
+const jasToggle = document.getElementById('jasToggle');
+const jasPanel = document.getElementById('jasPanel');
+const jasClose = document.getElementById('jasClose');
+const jasSend = document.getElementById('jasSend');
+const jasInput = document.getElementById('jasInput');
+const jasMessages = document.getElementById('jasMessages');
+const jasMode = document.getElementById('jasMode');
+const jasMic = document.getElementById('jasMic');
+const jasAvatar = document.getElementById('jasAvatar');
+
+if (jasToggle) {
+    jasToggle.addEventListener('click', () => {
+        const visible = jasPanel.style.display === 'flex';
+        if (visible) {
+            jasPanel.style.display = 'none';
+            document.getElementById('jasWidget').setAttribute('aria-hidden', 'true');
+        } else {
+            jasPanel.style.display = 'flex';
+            document.getElementById('jasWidget').setAttribute('aria-hidden', 'false');
+            jasInput.focus();
+            appendBotMessage('Hello! I\'m Jas AI — pick a mode and ask me anything. Try \"Explain photoelectric effect\" or ask for a PCM study plan.');
+        }
+    });
+}
+
+if (jasClose) { jasClose.addEventListener('click', () => { jasPanel.style.display = 'none'; }); }
+if (jasSend) { jasSend.addEventListener('click', sendJasMessage); }
+if (jasInput) { jasInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendJasMessage(); }); }
+
+let recognition = null;
+let recognizing = false;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.addEventListener('result', (event) => {
+        const text = event.results[0][0].transcript;
+        jasInput.value = text;
+        sendJasMessage();
+    });
+
+    recognition.addEventListener('end', () => { recognizing = false; jasMic.classList.remove('recording'); });
+}
+
+if (jasMic) {
+    jasMic.addEventListener('click', () => {
+        if (!recognition) { alert('Voice input not supported in this browser.'); return; }
+        if (recognizing) { recognition.stop(); recognizing = false; jasMic.classList.remove('recording'); }
+        else { recognition.start(); recognizing = true; jasMic.classList.add('recording'); }
+    });
+}
+
+function appendUserMessage(text) {
+    const el = document.createElement('div'); el.className = 'jas-bubble user'; el.innerHTML = escapeHtml(text);
+    jasMessages.appendChild(el);
+    jasMessages.scrollTop = jasMessages.scrollHeight;
+}
+
+function appendBotMessage(text) {
+    const el = document.createElement('div'); el.className = 'jas-bubble bot'; el.innerHTML = text.replace(/\n/g, '<br>');
+    jasMessages.appendChild(el);
+    jasMessages.scrollTop = jasMessages.scrollHeight;
+}
+
+function showTyping() {
+    const el = document.createElement('div'); el.id = 'jasTyping'; el.className = 'jas-bubble bot jas-typing'; el.innerText = 'Jas is typing...';
+    jasMessages.appendChild(el);
+    jasMessages.scrollTop = jasMessages.scrollHeight;
+}
+
+function hideTyping() {
+    const t = document.getElementById('jasTyping'); if (t) t.remove();
+}
+
+function sendJasMessage() {
+    const text = jasInput.value.trim();
+    if (!text) return;
+
+    appendUserMessage(text);
+    jasInput.value = '';
+
+    showTyping();
+    // Prepare payload
+    const payload = { message: text, mode: jasMode.value || 'general' };
+
+    fetch('/api/jas', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideTyping();
+        if (data && data.reply) {
+            appendBotMessage(data.reply);
+            animateAvatarBounce();
+            speakTextIfSupported(data.reply);
+        } else {
+            appendBotMessage('Sorry, something went wrong.');
+        }
+    })
+    .catch(err => {
+        console.error('Jas error', err); hideTyping(); appendBotMessage('Error contacting Jas AI. Try again later.');
+    });
+}
+
+function animateAvatarBounce() {
+    jasAvatar.animate([
+        { transform: 'translateY(0)' },
+        { transform: 'translateY(-6px)' },
+        { transform: 'translateY(0)' }
+    ], { duration: 400, easing: 'ease-out' });
+}
+
+function speakTextIfSupported(text) {
+    if (!('speechSynthesis' in window)) return;
+    const utter = new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g, ''));
+    utter.lang = 'en-US';
+    utter.rate = 1.0; utter.pitch = 1.0;
+    speechSynthesis.cancel(); // stop any ongoing
+    speechSynthesis.speak(utter);
+}
+
+// Accessibility: close Jas panel on escape
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && jasPanel && jasPanel.style.display === 'flex') { jasPanel.style.display = 'none'; } });
+
+// Small welcome message when the page loads
+window.addEventListener('load', () => {
+    // Preload polite welcome into messages but don't show until opened
+    // (We show when user opens widget)
+});
