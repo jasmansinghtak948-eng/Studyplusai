@@ -398,6 +398,170 @@ canvas {
   margin-bottom: 10px;
 }
 
+/* ========== JAS AI WIDGET ========== */
+.jas-widget {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2000;
+  font-family: inherit;
+}
+
+.jas-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(99,102,241,0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.jas-toggle:hover { transform: translateY(-3px); }
+
+.jas-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffffff22, #ffffff11);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position: relative;
+  border: 2px solid rgba(255,255,255,0.15);
+  overflow: hidden;
+}
+
+.jas-eyes {
+  width: 18px;
+  height: 6px;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 0 18px rgba(255,255,255,0.5);
+  animation: jasBlink 4s infinite ease-in-out;
+}
+
+@keyframes jasBlink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  92% { transform: scaleY(0.1); }
+}
+
+.jas-panel {
+  width: 360px;
+  max-width: calc(100vw - 48px);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+  margin-bottom: 12px;
+  padding: 12px;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.jas-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.jas-title { font-weight:700; color:var(--dark); }
+
+.jas-modes { display:flex; gap:8px; align-items:center; }
+
+.jas-messages {
+  min-height: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 8px;
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+
+.jas-bubble {
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 85%;
+  line-height: 1.4;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.jas-bubble.user {
+  align-self: flex-end;
+  background: linear-gradient(90deg, #eef2ff, white);
+  color: var(--dark);
+  border: 1px solid var(--border);
+}
+
+.jas-bubble.bot {
+  align-self: flex-start;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+}
+
+.jas-input-row {
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.jas-input { flex:1; padding:10px 12px; border-radius:10px; border:1px solid var(--border); }
+
+.jas-send { padding:10px 14px; border-radius:10px; border:none; background:var(--primary); color:white; }
+
+.jas-mic { padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:transparent; cursor:pointer; }
+
+.jas-typing { font-style: italic; opacity: 0.9; }
+
+/* small animation for incoming messages */
+.jas-bubble { transform: translateY(6px); opacity:0; animation: jasPop 0.25s forwards; }
+@keyframes jasPop { to { transform: translateY(0); opacity:1; } }
+
+/* Cloud LLM & Sync switch */
+.jas-switch { display:flex; align-items:center; gap:6px; background:transparent; color:var(--text); }
+.jas-switch input { width: 18px; height: 18px; }
+.jas-switch-label { font-size:0.85rem; color:var(--text); }
+
+/* subtle floating background inspired by modern edu sites */
+.jas-panel::before {
+  content: '';
+  position: absolute;
+  left: -30px;
+  top: -40px;
+  width: 220px;
+  height: 220px;
+  border-radius: 40%;
+  background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.14), transparent 30%), radial-gradient(circle at 70% 70%, rgba(139,92,246,0.1), transparent 30%);
+  transform: rotate(15deg);
+  z-index: 0;
+  animation: floaty 6s ease-in-out infinite;
+}
+
+/* subtle additional waves for hero similar to saiacademy */
+.hero-shapes .shape-1 { animation: move1 8s ease-in-out infinite; opacity:0.12 }
+.hero-shapes .shape-2 { animation: move2 10s ease-in-out infinite; opacity:0.11 }
+.hero-shapes .shape-3 { animation: move3 12s ease-in-out infinite; opacity:0.09 }
+
+@keyframes move1 { 0% {transform: translateY(0) rotate(0deg)} 50% {transform: translateY(-16px) rotate(6deg)} 100% {transform: translateY(0) rotate(0deg)} }
+@keyframes move2 { 0% {transform: translateY(0) rotate(0deg)} 50% {transform: translateY(12px) rotate(-4deg)} 100% {transform: translateY(0) rotate(0deg)} }
+@keyframes move3 { 0% {transform: translateY(0) rotate(0deg)} 50% {transform: translateY(-10px) rotate(3deg)} 100% {transform: translateY(0) rotate(0deg)} }
+
+@keyframes floaty {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* message fade & slide sequence */
+.jas-bubble { will-change: transform, opacity; }
+
 .features-showcase .feature-card p {
   color: var(--text);
   line-height: 1.6;
