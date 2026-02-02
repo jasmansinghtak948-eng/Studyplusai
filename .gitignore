@@ -17,3 +17,8 @@ create_db.py
 *.egg-info/
 dist/
 build/
+# Session store (local development)
+jas_sessions.json
+# Environment / secrets
+.env.local
+.env.*.local

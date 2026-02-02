@@ -176,6 +176,54 @@
   </div>
 </div>
 
+<!-- Jas AI Chat Widget -->
+<div id="jasWidget" class="jas-widget" aria-hidden="true">
+  <button id="jasToggle" class="jas-toggle" aria-label="Open Jas AI chat">
+    <div class="jas-avatar" id="jasAvatar">
+      <div class="jas-eyes"></div>
+    </div>
+    <span class="jas-label">Jas AI</span>
+  </button>
+
+  <div id="jasPanel" class="jas-panel" role="dialog" aria-modal="false">
+    <div class="jas-header">
+      <div class="jas-title">Jas AI — Your Study Assistant</div>
+      <div class="jas-modes">
+        <select id="jasMode" aria-label="Study mode">
+          <option value="general">General</option>
+          <option value="pcm">PCM Study Mode</option>
+          <option value="doubt">Doubt Solver</option>
+        </select>
+        <label class="jas-switch" title="Enable cloud LLM replies">
+          <input type="checkbox" id="jasCloudToggle" />
+          <span class="jas-switch-label">Cloud LLM</span>
+        </label>
+        <label class="jas-switch" title="Sync history with server">
+          <input type="checkbox" id="jasSyncToggle" />
+          <span class="jas-switch-label">Sync</span>
+        </label>
+        <label class="jas-switch" title="Get detailed step-by-step solutions">
+          <input type="checkbox" id="jasDetailedToggle" />
+          <span class="jas-switch-label">Detailed</span>
+        </label>
+        <label class="jas-switch" title="Use WolframAlpha (if configured)">
+          <input type="checkbox" id="jasWolframToggle" />
+          <span class="jas-switch-label">Wolfram</span>
+        </label>
+        <button id="jasClose" class="btn" aria-label="Close">✕</button>
+      </div>
+    </div>
+
+    <div id="jasMessages" class="jas-messages" role="log" aria-live="polite"></div>
+
+    <div class="jas-input-row">
+      <button id="jasMic" class="jas-mic" title="Voice input">🎤</button>
+      <input id="jasInput" class="jas-input" placeholder="Ask a question or request a study plan..." />
+      <button id="jasSend" class="jas-send" aria-label="Send">Send</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/static/script.js"></script>
 </body>
