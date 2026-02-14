@@ -1,13 +1,3 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/codemaster/c/page": "app/codemaster/c/page.js",
-  "/codemaster/cpp/page": "app/codemaster/cpp/page.js",
-  "/codemaster/css/page": "app/codemaster/css/page.js",
-  "/codemaster/html/page": "app/codemaster/html/page.js",
-  "/codemaster/page": "app/codemaster/page.js",
-  "/codemaster/oracle/page": "app/codemaster/oracle/page.js",
-  "/codemaster/python/page": "app/codemaster/python/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/page": "app/page.js",
-  "/tests/upload/page": "app/tests/upload/page.js"
+  "/page": "app/page.js"
 }
