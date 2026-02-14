@@ -22,3 +22,25 @@ jas_sessions.json
 # Environment / secrets
 .env.local
 .env.*.local
+
+# Node.js / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/package-lock.json
+frontend/.env.local
+frontend/.env.*.local
+
+# Python
+.pytest_cache/
+.venv/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
