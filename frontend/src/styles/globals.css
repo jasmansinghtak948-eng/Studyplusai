@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+ utilities;
 
 /* Pastel gradient background */
 :root {
