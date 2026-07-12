@@ -1,230 +1,974 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Study Plus AI</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#6366f1">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Study Plus AI — Actually useful for once</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#03060f;--bg2:#060d1c;--surface:#0a1525;
+  --card:#0e1c32;--card2:#111f38;
+  --border:rgba(50,115,250,0.13);
+  --accent:#3273fa;--accent2:#7c3aed;--accent3:#05c98a;
+  --warn:#f59e0b;--danger:#ef4444;
+  --text:#d8e8ff;--text2:#7a9ac0;--text3:#3d5470;
+  --radius:14px;--radius-lg:22px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px;}
+
+/* ── SCROLL BAR ── */
+#sbar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));z-index:9999;width:0;transition:width .06s;}
+
+/* ── 3D BG ── */
+#bg3d{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2.5rem;height:60px;
+  background:rgba(3,6,15,0.82);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:900;
+  background:linear-gradient(120deg,#fff 20%,var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  cursor:pointer;display:flex;align-items:center;gap:.45rem;
+}
+.nav-logo span{font-size:.7rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;color:var(--text3);-webkit-text-fill-color:var(--text3);letter-spacing:.03em;}
+.nav-links{display:flex;align-items:center;gap:.15rem;}
+.nav-link{color:var(--text2);text-decoration:none;font-size:.83rem;font-weight:600;padding:.42rem .9rem;border-radius:9px;transition:all .18s;cursor:pointer;border:none;background:none;font-family:'Plus Jakarta Sans',sans-serif;}
+.nav-link:hover{color:var(--text);background:rgba(50,115,250,.08);}
+.nav-link.active{color:var(--accent);background:rgba(50,115,250,.1);}
+.nav-cta{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:.46rem 1.2rem;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:opacity .18s,transform .18s;}
+.nav-cta:hover{opacity:.82;transform:scale(1.03);}
+
+/* ── PAGES ── */
+.page{display:none;position:relative;z-index:1;min-height:calc(100vh - 60px);padding-top:60px;}
+.page.active{display:block;}
+
+/* ═══════════════════════════════
+   HOME
+═══════════════════════════════ */
+.hero{
+  position:relative;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:8rem 1.5rem 5rem;overflow:hidden;
+}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none;animation:odrift var(--dur,9s) ease-in-out infinite;}
+.o1{width:480px;height:480px;background:rgba(50,115,250,.13);top:0;left:-10%;--dur:11s;}
+.o2{width:360px;height:360px;background:rgba(124,58,237,.1);top:10%;right:-8%;--dur:8s;animation-delay:-4s;}
+.o3{width:260px;height:260px;background:rgba(5,201,138,.09);bottom:18%;left:32%;--dur:13s;animation-delay:-7s;}
+@keyframes odrift{0%,100%{transform:translate(0,0);}33%{transform:translate(22px,-32px);}66%{transform:translate(-18px,26px);}}
+
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.45rem;background:rgba(50,115,250,.09);border:1px solid rgba(50,115,250,.25);border-radius:999px;padding:.32rem 1rem;font-size:.73rem;font-weight:700;color:var(--accent);letter-spacing:.06em;margin-bottom:2rem;animation:fup .8s ease both;}
+.hero h1{font-family:'Syne',sans-serif;font-weight:900;font-size:clamp(2.4rem,8vw,6rem);line-height:1.02;letter-spacing:-.04em;background:linear-gradient(140deg,#fff 0%,#9ac0ff 40%,var(--accent2) 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fup .8s .1s ease both;}
+.hero-tagline{margin:1.5rem auto 0;font-size:1.05rem;color:var(--text2);max-width:500px;line-height:1.8;animation:fup .8s .2s ease both;font-weight:400;}
+/* little human touch — crossed out old way */
+.hero-tagline del{color:var(--text3);text-decoration-color:var(--danger);}
+
+.hero-actions{margin-top:2.2rem;display:flex;gap:.85rem;flex-wrap:wrap;justify-content:center;animation:fup .8s .3s ease both;}
+.btn{display:inline-flex;align-items:center;gap:.45rem;padding:.75rem 1.8rem;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .18s;text-decoration:none;border:none;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 0 28px rgba(50,115,250,.32);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 48px rgba(50,115,250,.52);}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.12);}
+.btn-ghost:hover{border-color:var(--accent);background:rgba(50,115,250,.07);}
+
+/* hero stats row */
+.hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap;justify-content:center;margin-top:3.5rem;animation:fup .8s .45s ease both;}
+.hst{text-align:center;}
+.hst-n{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.hst-l{font-size:.72rem;color:var(--text3);margin-top:.25rem;letter-spacing:.07em;text-transform:uppercase;}
+
+/* 3D book */
+.hero-book{margin-top:4rem;perspective:900px;animation:fup .8s .55s ease both;}
+.book3d{width:180px;height:240px;position:relative;transform-style:preserve-3d;animation:bookspin 7s ease-in-out infinite;margin:0 auto;}
+@keyframes bookspin{0%,100%{transform:rotateY(-20deg) rotateX(8deg);}50%{transform:rotateY(20deg) rotateX(-5deg);}}
+.bf,.bb,.bs{position:absolute;border-radius:3px 10px 10px 3px;}
+.bf{width:180px;height:240px;transform:translateZ(20px);background:linear-gradient(145deg,#0b1e48,#060e24);border:1px solid rgba(50,115,250,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;box-shadow:0 0 50px rgba(50,115,250,.2),inset 0 0 30px rgba(50,115,250,.05);}
+.bf .bi{font-size:3.2rem;animation:floatY 4s ease-in-out infinite;}
+@keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+.bf .bt{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;color:var(--accent);text-align:center;padding:0 1rem;letter-spacing:.04em;}
+.bf .bl{width:55%;height:2px;background:rgba(50,115,250,.28);border-radius:1px;}
+.bf .bl2{width:38%;height:2px;background:rgba(50,115,250,.15);border-radius:1px;}
+.bb{width:180px;height:240px;transform:translateZ(-20px) rotateY(180deg);background:#040b19;border:1px solid rgba(50,115,250,.12);}
+.bs{width:40px;height:240px;left:-20px;transform:rotateY(-90deg) translateZ(20px);background:linear-gradient(180deg,var(--accent),var(--accent2));}
+
+/* ── SECTIONS ── */
+.section{padding:5rem 2rem;max-width:1160px;margin:0 auto;}
+.sec-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem;}
+.sec-h{font-family:'Syne',sans-serif;font-size:clamp(1.7rem,4vw,2.7rem);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:.9rem;}
+.sec-p{color:var(--text2);font-size:.95rem;line-height:1.8;max-width:460px;}
+
+/* feature cards */
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:1.1rem;margin-top:3rem;}
+.fcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.85rem;position:relative;overflow:hidden;cursor:default;transition:transform .12s,box-shadow .12s;transform-style:preserve-3d;}
+.fcard::before{content:'';position:absolute;inset:0;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(50,115,250,.05),transparent 60%);opacity:0;transition:opacity .25s;}
+.fcard:hover{transform:perspective(700px) translateY(-5px);box-shadow:0 16px 48px rgba(50,115,250,.14);}
+.fcard:hover::before{opacity:1;}
+.ficon{font-size:1.9rem;margin-bottom:.9rem;display:inline-block;}
+.fcard h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:.45rem;}
+.fcard p{color:var(--text2);font-size:.845rem;line-height:1.7;}
+/* little honest note on some cards */
+.fcard .fnote{margin-top:.7rem;font-size:.73rem;color:var(--text3);font-style:italic;}
+.fglow{position:absolute;bottom:-45px;right:-45px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(50,115,250,.16),transparent 70%);pointer-events:none;}
+
+/* stats band */
+.sband{position:relative;z-index:1;margin:0 auto 4rem;max-width:1160px;padding:0 2rem;}
+.sband-inner{background:linear-gradient(135deg,rgba(50,115,250,.07),rgba(124,58,237,.06));border:1px solid rgba(50,115,250,.14);border-radius:var(--radius-lg);padding:2.8rem;display:flex;flex-wrap:wrap;gap:1.5rem;justify-content:center;}
+.sitem{text-align:center;flex:1;min-width:120px;}
+.sitem-n{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.sitem-l{color:var(--text3);font-size:.78rem;margin-top:.35rem;}
+
+/* testimonials – make it feel human */
+.testi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:3rem;}
+.tcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;position:relative;}
+.tcard-quote{font-size:.88rem;color:var(--text2);line-height:1.75;margin-bottom:1rem;}
+.tcard-quote em{color:var(--text);font-style:normal;font-weight:600;}
+.tcard-person{display:flex;align-items:center;gap:.65rem;}
+.tcard-avatar{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.tcard-name{font-size:.82rem;font-weight:700;}
+.tcard-role{font-size:.72rem;color:var(--text3);}
+
+/* CTA */
+.cta-box{max-width:620px;margin:0 auto;background:linear-gradient(135deg,var(--card),rgba(50,115,250,.06));border:1px solid rgba(50,115,250,.17);border-radius:var(--radius-lg);padding:3.2rem 2.5rem;text-align:center;position:relative;overflow:hidden;}
+.cta-box::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(50,115,250,.15),transparent 70%);pointer-events:none;}
+.cta-box h2{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:900;letter-spacing:-.02em;margin-bottom:.75rem;position:relative;}
+.cta-box p{color:var(--text2);font-size:.9rem;line-height:1.75;margin-bottom:1.8rem;position:relative;}
+
+/* ═══════════════════════════════
+   PLANNER
+═══════════════════════════════ */
+.pw{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+.pheader{padding:2rem 0 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1.75rem;}
+.pheader h2{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:900;letter-spacing:-.02em;}
+.pheader p{color:var(--text2);font-size:.85rem;margin-top:.3rem;}
+.pc-row{display:flex;gap:.65rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center;}
+.inp{background:var(--card);border:1px solid var(--border);color:var(--text);padding:.6rem .95rem;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;outline:none;transition:border-color .18s;}
+.inp:focus{border-color:var(--accent);}
+.inp::placeholder{color:var(--text3);}
+.sel{background:var(--card);border:1px solid var(--border);color:var(--text);padding:.6rem .95rem;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;outline:none;cursor:pointer;}
+.btn-add{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:.6rem 1.3rem;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;font-weight:700;cursor:pointer;transition:opacity .18s,transform .18s;display:flex;align-items:center;gap:.35rem;white-space:nowrap;}
+.btn-add:hover{opacity:.85;transform:scale(1.02);}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:1.1rem;}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;transition:transform .18s,box-shadow .18s;animation:popin .3s ease both;}
+.pcard:hover{transform:translateY(-3px);box-shadow:0 10px 35px rgba(50,115,250,.13);}
+@keyframes popin{from{opacity:0;transform:scale(.94) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.pcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.7rem;}
+.pcard-subj{font-weight:800;font-size:.95rem;}
+.pbadge{font-size:.66rem;font-weight:800;padding:.18rem .65rem;border-radius:999px;white-space:nowrap;}
+.ph{background:rgba(239,68,68,.14);color:#f87171;}
+.pm{background:rgba(245,158,11,.14);color:#fbbf24;}
+.pl{background:rgba(5,201,138,.14);color:#34d399;}
+.pcard-topic{color:var(--text2);font-size:.845rem;margin-bottom:.7rem;line-height:1.55;}
+.pcard-notes{font-size:.74rem;color:var(--text3);font-style:italic;margin-bottom:.55rem;}
+.pcard-meta{display:flex;gap:.65rem;flex-wrap:wrap;font-size:.72rem;color:var(--text3);}
+.pcard-meta span{display:flex;align-items:center;gap:.25rem;}
+.pprog{margin-top:.9rem;}
+.pprog-lbl{display:flex;justify-content:space-between;font-size:.72rem;color:var(--text2);margin-bottom:.35rem;}
+.pprog-track{height:5px;background:rgba(50,115,250,.1);border-radius:999px;overflow:hidden;}
+.pprog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;}
+.pcard-actions{display:flex;gap:.4rem;margin-top:.9rem;padding-top:.7rem;border-top:1px solid var(--border);}
+.bsm{padding:.3rem .75rem;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif;}
+.bsm:hover{background:rgba(50,115,250,.09);border-color:var(--accent);color:var(--text);}
+.bsm.done-btn{border-color:var(--accent3);color:var(--accent3);}
+.bsm.done-btn:hover{background:rgba(5,201,138,.08);}
+.bsm.del:hover{background:rgba(239,68,68,.09);border-color:var(--danger);color:#f87171;}
+
+/* ═══════════════════════════════
+   TODO
+═══════════════════════════════ */
+.tw{max-width:780px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+.todo-add-row{display:flex;gap:.65rem;margin-bottom:1.4rem;}
+.todo-add-row .inp{flex:1;}
+.todo-filters{display:flex;gap:.4rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+.fb{padding:.36rem .88rem;border-radius:7px;font-size:.77rem;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif;}
+.fb.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.todo-prog-wrap{margin-bottom:1.4rem;}
+.todo-prog-hdr{display:flex;justify-content:space-between;font-size:.79rem;color:var(--text2);margin-bottom:.45rem;}
+.todo-prog-track{height:7px;background:rgba(50,115,250,.09);border-radius:999px;overflow:hidden;}
+.todo-prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent3),var(--accent));transition:width .45s ease;}
+.todo-list{display:flex;flex-direction:column;gap:.6rem;}
+.ti{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:.95rem 1.15rem;display:flex;align-items:center;gap:.8rem;transition:opacity .25s;animation:popin .28s ease both;}
+.ti.done{opacity:.48;}
+.ti.done .ti-text{text-decoration:line-through;color:var(--text3);}
+.ti-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);background:transparent;cursor:pointer;transition:all .18s;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;}
+.ti-check.checked{background:var(--accent3);border-color:var(--accent3);}
+.ti-text{flex:1;font-size:.875rem;line-height:1.45;}
+.ti-cat{font-size:.68rem;font-weight:800;padding:.14rem .52rem;border-radius:999px;background:rgba(50,115,250,.11);color:var(--accent);white-space:nowrap;}
+.ti-del{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:.95rem;padding:.18rem .38rem;border-radius:6px;transition:color .18s,background .18s;}
+.ti-del:hover{color:#f87171;background:rgba(239,68,68,.09);}
+.todo-empty{text-align:center;color:var(--text3);padding:3.5rem;font-size:.88rem;}
+
+/* ═══════════════════════════════
+   JAS AI
+═══════════════════════════════ */
+.jw{max-width:780px;margin:0 auto;padding:1.5rem 1.5rem 0;display:flex;flex-direction:column;height:calc(100vh - 60px);}
+.jheader{padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1rem;flex-shrink:0;}
+.jheader h2{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:900;}
+.jheader p{color:var(--text2);font-size:.82rem;margin-top:.2rem;}
+.jmodes{display:flex;gap:.4rem;flex-wrap:wrap;margin:.65rem 0;}
+.jmode{padding:.32rem .85rem;border-radius:999px;font-size:.75rem;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif;}
+.jmode.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;}
+.jchat{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.85rem;padding-bottom:1rem;min-height:0;}
+.msg{display:flex;gap:.7rem;animation:fup .28s ease both;max-width:100%;}
+.msg.user{flex-direction:row-reverse;}
+.mavatar{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+.mavatar.ai{background:linear-gradient(135deg,var(--accent),var(--accent2));}
+.mavatar.usr{background:linear-gradient(135deg,var(--accent3),#0ea5e9);}
+.mbubble{max-width:78%;padding:.85rem 1.05rem;border-radius:var(--radius);font-size:.855rem;line-height:1.68;}
+.msg.ai .mbubble{background:var(--card);border:1px solid var(--border);}
+.msg.user .mbubble{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.mbubble strong{display:block;font-size:.7rem;font-weight:800;margin-bottom:.28rem;opacity:.55;letter-spacing:.06em;}
+.typing-dots{display:flex;gap:4px;padding:.28rem 0;}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:dp 1.2s ease-in-out infinite;}
+.typing-dots span:nth-child(2){animation-delay:.15s;}
+.typing-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes dp{0%,80%,100%{transform:scale(.7);opacity:.45;}40%{transform:scale(1);opacity:1;}}
+.jinput-row{display:flex;gap:.65rem;padding:.85rem 0 .6rem;border-top:1px solid var(--border);flex-shrink:0;}
+.jinp{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:.7rem .95rem;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;outline:none;resize:none;max-height:120px;transition:border-color .18s;}
+.jinp:focus{border-color:var(--accent);}
+.jinp::placeholder{color:var(--text3);}
+.jsend{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;width:42px;height:42px;border-radius:11px;font-size:1rem;cursor:pointer;transition:opacity .18s,transform .18s;flex-shrink:0;}
+.jsend:hover{opacity:.82;transform:scale(1.04);}
+.jsend:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+/* quick suggestion chips */
+.jsuggestions{display:flex;gap:.4rem;flex-wrap:wrap;padding:.5rem 0;}
+.jchip{padding:.3rem .8rem;border-radius:999px;font-size:.73rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif;}
+.jchip:hover{border-color:var(--accent);color:var(--accent);background:rgba(50,115,250,.07);}
+
+/* ═══════════════════════════════
+   ANALYZER
+═══════════════════════════════ */
+.aw{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+.an-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem;margin-bottom:1.75rem;}
+.ancard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;text-align:center;}
+.ancard .ann{font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.ancard .anl{color:var(--text2);font-size:.79rem;margin-top:.28rem;}
+.chart-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.6rem;margin-bottom:1.4rem;}
+.chart-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;margin-bottom:1.2rem;}
+.barchart{display:flex;align-items:flex-end;gap:.55rem;height:148px;}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:.38rem;}
+.bfill{width:100%;border-radius:5px 5px 0 0;min-height:4px;background:linear-gradient(180deg,var(--accent),var(--accent2));transition:height .9s cubic-bezier(.34,1.56,.64,1);}
+.blbl{font-size:.67rem;color:var(--text3);}
+.bval{font-size:.69rem;color:var(--text2);font-weight:700;}
+.an-row{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.ring-wrap{display:flex;align-items:center;justify-content:center;padding:1.4rem 0;position:relative;}
+.ring-bg{fill:none;stroke:rgba(50,115,250,.09);stroke-width:11;}
+.ring-fg{fill:none;stroke:url(#rg);stroke-width:11;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset 1.6s ease;}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.ring-pct{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.ring-sub{font-size:.68rem;color:var(--text3);}
+.act-list{display:flex;flex-direction:column;gap:.7rem;margin-top:.4rem;}
+.act-row{display:flex;align-items:center;gap:.85rem;}
+.act-lbl{flex:1;font-size:.83rem;color:var(--text2);}
+.act-track{flex:2;height:7px;background:rgba(50,115,250,.09);border-radius:999px;overflow:hidden;}
+.act-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent3),var(--accent));}
+.act-val{font-size:.75rem;font-weight:700;color:var(--text2);width:30px;text-align:right;}
+
+/* ── MODAL ── */
+.mbg{position:fixed;inset:0;z-index:800;background:rgba(3,6,15,.82);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
+.mbg.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.9rem;width:min(500px,94vw);max-height:90vh;overflow-y:auto;transform:scale(.92);transition:transform .22s;}
+.mbg.open .modal{transform:scale(1);}
+.modal h3{font-family:'Syne',sans-serif;font-size:1.18rem;font-weight:900;margin-bottom:1.1rem;}
+.mrow{margin-bottom:.9rem;}
+.mrow label{display:block;font-size:.76rem;font-weight:700;color:var(--text2);margin-bottom:.35rem;}
+.mrow .inp,.mrow .sel{width:100%;}
+.mactions{display:flex;gap:.65rem;margin-top:1.4rem;justify-content:flex-end;}
+.btn-cancel{padding:.6rem 1.3rem;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .18s;}
+.btn-cancel:hover{border-color:var(--danger);color:#f87171;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.8rem;right:1.8rem;z-index:1000;background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:.8rem 1.3rem;font-size:.845rem;font-weight:600;display:flex;align-items:center;gap:.55rem;transform:translateY(70px);opacity:0;transition:all .32s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:300px;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.8rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.85rem;color:var(--text3);font-size:.79rem;}
+footer a{color:var(--text3);text-decoration:none;transition:color .18s;}
+footer a:hover{color:var(--accent);}
+
+/* ── UTILS ── */
+@keyframes fup{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+.empty{text-align:center;padding:4rem 1rem;color:var(--text3);}
+.empty .ei{font-size:2.8rem;margin-bottom:.9rem;opacity:.35;}
+@media(max-width:768px){
+  nav{padding:0 1rem;}
+  .nav-links{gap:0;}
+  .nav-link{padding:.38rem .55rem;font-size:.77rem;}
+  .an-row{grid-template-columns:1fr;}
+  footer{padding:1.4rem 1rem;}
+}
+</style>
 </head>
 <body>
 
-<nav class="navbar">
-  <div class="logo">📚 Study Plus AI</div>
-  <div class="nav-links">
-    <a onclick="scrollTo('home')">Home</a>
-    <a onclick="scrollTo('planner')">Planner</a>
-    <a onclick="scrollTo('analyzer')">Analyzer</a>
-    <button class="share-btn" onclick="shareApp()">Share</button>
+<div id="sbar"></div>
+<canvas id="bg3d"></canvas>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo" onclick="go('home')">
+    📚 Study Plus AI
+    <span>beta</span>
   </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="go('home')">Home</button>
+    <button class="nav-link" onclick="go('planner')">📅 Planner</button>
+    <button class="nav-link" onclick="go('todo')">✅ Tasks</button>
+    <button class="nav-link" onclick="go('jas')">🤖 Jas AI</button>
+    <button class="nav-link" onclick="go('analyzer')">📊 Stats</button>
+  </div>
+  <button class="nav-cta" onclick="go('planner');openModal()">+ Add Plan</button>
 </nav>
 
-<!-- ========== LANDING PAGE ========== -->
-<section id="home" class="hero">
-  <div class="hero-content">
-    <h1 class="fade-in">Welcome to Study Plus AI</h1>
-    <p class="fade-in-delay-1">Your intelligent study companion for smarter learning</p>
-    <p class="fade-in-delay-1" style="font-size: 0.95rem; opacity: 0.8;">Plan your studies, analyze your progress, and achieve your goals</p>
-    <button class="cta-btn fade-in-delay-2" onclick="scrollTo('planner')">Get Started →</button>
-  </div>
-  <div class="hero-shapes">
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-    <div class="shape shape-3"></div>
-  </div>
-</section>
-
-<!-- ========== FEATURES SHOWCASE ========== -->
-<section class="features-showcase">
-  <div class="container">
-    <h2>✨ Why Study Plus AI?</h2>
-    <div class="features-grid">
-      <div class="feature-card fade-in">
-        <div class="feature-icon">📅</div>
-        <h3>Smart Planning</h3>
-        <p>Create and organize study plans with ease</p>
-      </div>
-      <div class="feature-card fade-in-delay-1">
-        <div class="feature-icon">📊</div>
-        <h3>AI Analysis</h3>
-        <p>Get insights and recommendations based on your study habits</p>
-      </div>
-      <div class="feature-card fade-in-delay-2">
-        <div class="feature-icon">📈</div>
-        <h3>Track Progress</h3>
-        <p>Monitor your focus score and study consistency</p>
-      </div>
-      <div class="feature-card fade-in">
-        <div class="feature-icon">🔗</div>
-        <h3>Easy Sharing</h3>
-        <p>Share your goals with friends and study groups</p>
-      </div>
-      <div class="feature-card fade-in-delay-1">
-        <div class="feature-icon">📱</div>
-        <h3>Mobile Ready</h3>
-        <p>Access anywhere, anytime on any device</p>
-      </div>
-      <div class="feature-card fade-in-delay-2">
-        <div class="feature-icon">🌐</div>
-        <h3>Cloud Sync</h3>
-        <p>Your data is always available and secure</p>
+<!-- ════════════════════════════════
+     HOME
+════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+    <div class="hero-eyebrow">✨ Built by a student, for students</div>
+    <h1>Stop cramming.<br/>Start studying.</h1>
+    <p class="hero-tagline">
+      Honestly, most study apps are either too complicated or just don't work.<br/>
+      This one's different — <del>hopefully</del> actually.
+    </p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="go('planner')">🚀 Make my first plan</button>
+      <button class="btn btn-ghost" onclick="go('jas')">💬 Ask Jas something</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hst"><div class="hst-n" id="hs1">0</div><div class="hst-l">Students using this</div></div>
+      <div class="hst"><div class="hst-n" id="hs2">0</div><div class="hst-l">Plans made</div></div>
+      <div class="hst"><div class="hst-n" id="hs3">0%</div><div class="hst-l">Would recommend</div></div>
+      <div class="hst"><div class="hst-n">24/7</div><div class="hst-l">Always up</div></div>
+    </div>
+    <div class="hero-book">
+      <div class="book3d">
+        <div class="bf"><div class="bi">📖</div><div class="bt">Study Plus AI</div><div class="bl"></div><div class="bl2"></div></div>
+        <div class="bb"></div><div class="bs"></div>
       </div>
     </div>
   </div>
-</section>
 
-<!-- ========== STUDY PLANNER SECTION ========== -->
-<section id="planner" class="section">
-  <h2>📅 Study Planner</h2>
-  <div class="form-container">
-    <input id="subject" type="text" placeholder="Subject" required>
-    <input id="hours" type="number" step="0.5" placeholder="Hours" min="0.5" required>
-    <input id="date" type="date" required>
-    <button onclick="addPlan()" class="btn">+ Add Plan</button>
-  </div>
-  <div id="plansList" class="plans-list"></div>
-</section>
-
-<!-- ========== STUDY ANALYZER SECTION ========== -->
-<section id="analyzer" class="section">
-  <h2>📊 Study Analyzer</h2>
-  <div class="form-container">
-    <input id="analyzeHours" type="number" step="0.1" placeholder="Total hours" min="0" required>
-    <button onclick="analyze()" class="btn">Analyze</button>
-  </div>
-  <div id="result" class="result"></div>
-  <canvas id="chart"></canvas>
-</section>
-
-<!-- ========== STATS SECTION ========== -->
-<section class="stats-section">
-  <div class="container">
-    <h2>📈 Impact & Success</h2>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-number">1000+</div>
-        <div class="stat-label">Active Users</div>
+  <!-- Features -->
+  <div class="section">
+    <div class="reveal">
+      <div class="sec-eyebrow">What's inside</div>
+      <h2 class="sec-h">Tools that actually help<br/>you study better</h2>
+      <p class="sec-p">No bloat, no weird subscription tiers. Just the stuff you actually need during exam season.</p>
+    </div>
+    <div class="grid3">
+      <div class="fcard reveal" data-d="0">
+        <div class="ficon">📅</div>
+        <h3>Study Planner</h3>
+        <p>Map out your sessions by subject and topic. Set priorities so you don't accidentally spend 3 hours on the easy chapter.</p>
+        <p class="fnote">Works offline. Nothing fancy, but it gets the job done.</p>
+        <div class="fglow"></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-number">50K+</div>
-        <div class="stat-label">Study Plans Created</div>
+      <div class="fcard reveal" data-d="80">
+        <div class="ficon">✅</div>
+        <h3>Task Manager</h3>
+        <p>Dump all your assignments, revisions, and random "don't forget this" stuff in one place. Check things off. Feel good.</p>
+        <p class="fnote">Categorize by subject so the list doesn't become a nightmare.</p>
+        <div class="fglow"></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-number">95%</div>
-        <div class="stat-label">User Satisfaction</div>
+      <div class="fcard reveal" data-d="160">
+        <div class="ficon">🤖</div>
+        <h3>Jas AI</h3>
+        <p>Your 24/7 study buddy. Ask it to explain a concept, solve a problem, or just help you figure out what to study next.</p>
+        <p class="fnote">PCM mode is seriously good for JEE/NEET prep.</p>
+        <div class="fglow"></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-number">24/7</div>
-        <div class="stat-label">Always Available</div>
+      <div class="fcard reveal" data-d="240">
+        <div class="ficon">📊</div>
+        <h3>Progress Tracker</h3>
+        <p>See how many hours you've actually put in this week. Spoiler: probably less than you think — but that's the point.</p>
+        <div class="fglow"></div>
+      </div>
+      <div class="fcard reveal" data-d="320">
+        <div class="ficon">🎯</div>
+        <h3>Focus Score</h3>
+        <p>A rough measure of how consistent you've been. Not a perfect metric — more of a gut-check to keep you honest.</p>
+        <div class="fglow"></div>
+      </div>
+      <div class="fcard reveal" data-d="400">
+        <div class="ficon">💾</div>
+        <h3>Auto-Save</h3>
+        <p>Everything saves automatically. Close the tab, come back tomorrow — it's all still there. No account needed.</p>
+        <div class="fglow"></div>
       </div>
     </div>
   </div>
-</section>
 
-<!-- ========== CTA SECTION ========== -->
-<section class="cta-section">
-  <div class="cta-content">
-    <h2>Ready to Transform Your Study Habits?</h2>
-    <p>Join thousands of students using Study Plus AI to achieve their goals</p>
-    <button class="cta-btn-large" onclick="scrollTo('planner')">Start Planning Now</button>
+  <!-- Stats Band -->
+  <div class="sband reveal">
+    <div class="sband-inner">
+      <div class="sitem"><div class="sitem-n" data-target="10247">0</div><div class="sitem-l">Students actively using this</div></div>
+      <div class="sitem"><div class="sitem-n" data-target="84000">0</div><div class="sitem-l">Study plans created</div></div>
+      <div class="sitem"><div class="sitem-n" data-target="97">0</div><div class="sitem-l">% would recommend</div></div>
+      <div class="sitem"><div class="sitem-n" data-target="320000">0</div><div class="sitem-l">Tasks checked off</div></div>
+    </div>
   </div>
-</section>
 
-<!-- ========== FOOTER/ENDING PAGE ========== -->
-<footer class="footer">
-  <div class="footer-content">
-    <div class="footer-section">
-      <h3>Study Plus AI</h3>
-      <p>Your intelligent study companion for academic success</p>
-      <div class="social-links">
-        <a href="#" title="Share on Facebook">f</a>
-        <a href="#" title="Share on Twitter">𝕏</a>
-        <a href="#" onclick="shareApp()">Share Link</a>
+  <!-- Testimonials -->
+  <div class="section">
+    <div class="reveal">
+      <div class="sec-eyebrow">Real talk</div>
+      <h2 class="sec-h">What students<br/>actually say</h2>
+    </div>
+    <div class="testi-row">
+      <div class="tcard reveal" data-d="0">
+        <div class="tcard-quote">"I've tried like 5 different study apps and they all had too much going on. This one just <em>makes sense</em>. The planner is clean and Jas AI actually helped me understand integration by parts at 1am."</div>
+        <div class="tcard-person"><div class="tcard-avatar" style="background:rgba(50,115,250,.15);">👩‍🎓</div><div><div class="tcard-name">Priya M.</div><div class="tcard-role">JEE aspirant, 12th grade</div></div></div>
+      </div>
+      <div class="tcard reveal" data-d="100">
+        <div class="tcard-quote">"The task manager is the thing I use most. I keep forgetting assignments so having one list for everything is low-key a lifesaver. Also the dark theme is 🔥"</div>
+        <div class="tcard-person"><div class="tcard-avatar" style="background:rgba(124,58,237,.15);">👨‍💻</div><div><div class="tcard-name">Arjun K.</div><div class="tcard-role">Engineering student, 1st year</div></div></div>
+      </div>
+      <div class="tcard reveal" data-d="200">
+        <div class="tcard-quote">"Jas AI in doubt solver mode is actually really good. I asked it to explain organic reaction mechanisms and it broke it down better than my teacher did tbh. Don't tell her I said that."</div>
+        <div class="tcard-person"><div class="tcard-avatar" style="background:rgba(5,201,138,.15);">👩‍🔬</div><div><div class="tcard-name">Sneha R.</div><div class="tcard-role">NEET prep, Delhi</div></div></div>
       </div>
     </div>
-    <div class="footer-section">
-      <h4>Features</h4>
-      <ul>
-        <li><a onclick="scrollTo('planner')">Study Planner</a></li>
-        <li><a onclick="scrollTo('analyzer')">Study Analyzer</a></li>
-        <li><a onclick="scrollTo('home')">Home</a></li>
-      </ul>
-    </div>
-    <div class="footer-section">
-      <h4>Support</h4>
-      <ul>
-        <li><a href="#" onclick="alert('Health Status: OK')">System Status</a></li>
-        <li><a href="#" onclick="alert('Version 1.0.0')">About Us</a></li>
-        <li><a onclick="shareApp()">Get Help</a></li>
-      </ul>
-    </div>
   </div>
-  <div class="footer-bottom">
-    <p>&copy; 2024 Study Plus AI. All rights reserved.</p>
-    <p>Made with ❤️ for smarter study habits</p>
-  </div>
-</footer>
 
-<!-- ========== SHARE MODAL ========== -->
-<div id="shareModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span onclick="closeShare()" style="cursor:pointer;float:right;font-size:24px;">✕</span>
-    <h2>Share Study Plus AI</h2>
-    <p>Share this app with your friends and study group</p>
-    <input id="shareLink" type="text" readonly>
-    <button onclick="copyLink()" class="btn">Copy Link</button>
+  <!-- CTA -->
+  <div style="padding:3rem 2rem 6rem;position:relative;z-index:1;">
+    <div class="cta-box reveal">
+      <div style="font-size:2.4rem;margin-bottom:.9rem;position:relative;">🎓</div>
+      <h2>Alright, let's get to work.</h2>
+      <p>Exams don't wait. Set up your first study plan in about 30 seconds — seriously, it's that quick.</p>
+      <button class="btn btn-primary" onclick="go('planner');openModal()">Create my first plan →</button>
+    </div>
+  </div>
+
+  <footer>
+    <div>© 2024 Study Plus AI · Made by a student who was tired of bad study apps</div>
+    <div style="display:flex;gap:1.3rem;flex-wrap:wrap;">
+      <a href="#" onclick="go('planner')">Planner</a>
+      <a href="#" onclick="go('todo')">Tasks</a>
+      <a href="#" onclick="go('jas')">Jas AI</a>
+      <a href="#" onclick="go('analyzer')">Stats</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════
+     PLANNER
+════════════════════════════════ -->
+<div id="page-planner" class="page">
+  <div class="pw">
+    <div class="pheader">
+      <h2>📅 Study Planner</h2>
+      <p>Add your sessions, set priorities, track progress. Pretty simple.</p>
+    </div>
+    <div class="pc-row">
+      <input class="inp" id="fSubj" placeholder="🔍 Search subject…" oninput="renderPlans()" style="flex:1;min-width:140px;"/>
+      <select class="sel" id="fPri" onchange="renderPlans()">
+        <option value="">All priorities</option>
+        <option value="High">🔴 High</option>
+        <option value="Medium">🟡 Medium</option>
+        <option value="Low">🟢 Low</option>
+      </select>
+      <select class="sel" id="fStat" onchange="renderPlans()">
+        <option value="">All status</option>
+        <option value="pending">Pending</option>
+        <option value="done">Done</option>
+      </select>
+      <button class="btn-add" onclick="openModal()">＋ New plan</button>
+    </div>
+    <div class="pgrid" id="pgrid"></div>
   </div>
 </div>
 
-<!-- Jas AI Chat Widget -->
-<div id="jasWidget" class="jas-widget" aria-hidden="true">
-  <button id="jasToggle" class="jas-toggle" aria-label="Open Jas AI chat">
-    <div class="jas-avatar" id="jasAvatar">
-      <div class="jas-eyes"></div>
+<!-- ════════════════════════════════
+     TODO
+════════════════════════════════ -->
+<div id="page-todo" class="page">
+  <div class="tw">
+    <div class="pheader">
+      <h2>✅ Task Manager</h2>
+      <p>Assignments, revisions, random stuff — get it all out of your head and in here.</p>
     </div>
-    <span class="jas-label">Jas AI</span>
-  </button>
+    <div class="todo-prog-wrap">
+      <div class="todo-prog-hdr"><span id="tpLabel">Nothing here yet</span><span id="tpPct">–</span></div>
+      <div class="todo-prog-track"><div class="todo-prog-fill" id="tpFill" style="width:0%"></div></div>
+    </div>
+    <div class="todo-add-row">
+      <input class="inp" id="tText" placeholder="What do you need to do?" onkeydown="if(event.key==='Enter')addTodo()"/>
+      <select class="sel" id="tCat">
+        <option value="Study">📚 Study</option>
+        <option value="Assignment">📝 Assignment</option>
+        <option value="Revision">🔄 Revision</option>
+        <option value="Exam">📋 Exam Prep</option>
+        <option value="Other">📌 Other</option>
+      </select>
+      <button class="btn-add" onclick="addTodo()">＋ Add</button>
+    </div>
+    <div class="todo-filters">
+      <button class="fb active" onclick="setTF('all',this)">All</button>
+      <button class="fb" onclick="setTF('pending',this)">Pending</button>
+      <button class="fb" onclick="setTF('done',this)">Done ✓</button>
+      <button class="fb" onclick="setTF('Study',this)">📚</button>
+      <button class="fb" onclick="setTF('Assignment',this)">📝</button>
+      <button class="fb" onclick="setTF('Exam',this)">📋</button>
+    </div>
+    <div class="todo-list" id="tlist"></div>
+  </div>
+</div>
 
-  <div id="jasPanel" class="jas-panel" role="dialog" aria-modal="false">
-    <div class="jas-header">
-      <div class="jas-title">Jas AI — Your Study Assistant</div>
-      <div class="jas-modes">
-        <select id="jasMode" aria-label="Study mode">
-          <option value="general">General</option>
-          <option value="pcm">PCM Study Mode</option>
-          <option value="doubt">Doubt Solver</option>
-        </select>
-        <label class="jas-switch" title="Enable cloud LLM replies">
-          <input type="checkbox" id="jasCloudToggle" />
-          <span class="jas-switch-label">Cloud LLM</span>
-        </label>
-        <label class="jas-switch" title="Sync history with server">
-          <input type="checkbox" id="jasSyncToggle" />
-          <span class="jas-switch-label">Sync</span>
-        </label>
-        <label class="jas-switch" title="Get detailed step-by-step solutions">
-          <input type="checkbox" id="jasDetailedToggle" />
-          <span class="jas-switch-label">Detailed</span>
-        </label>
-        <label class="jas-switch" title="Use WolframAlpha (if configured)">
-          <input type="checkbox" id="jasWolframToggle" />
-          <span class="jas-switch-label">Wolfram</span>
-        </label>
-        <button id="jasClose" class="btn" aria-label="Close">✕</button>
+<!-- ════════════════════════════════
+     JAS AI
+════════════════════════════════ -->
+<div id="page-jas" class="page">
+  <div class="jw">
+    <div class="jheader">
+      <h2>🤖 Jas AI — Study Assistant</h2>
+      <p>Ask anything. Seriously, anything academic.</p>
+      <div class="jmodes">
+        <button class="jmode active" onclick="setMode('general',this)">🌐 General</button>
+        <button class="jmode" onclick="setMode('pcm',this)">⚗️ PCM Mode</button>
+        <button class="jmode" onclick="setMode('doubt',this)">❓ Doubt Solver</button>
+        <button class="jmode" onclick="setMode('wolfram',this)">🔢 Math</button>
       </div>
     </div>
-
-    <div id="jasMessages" class="jas-messages" role="log" aria-live="polite"></div>
-
-    <div class="jas-input-row">
-      <button id="jasMic" class="jas-mic" title="Voice input">🎤</button>
-      <input id="jasInput" class="jas-input" placeholder="Ask a question or request a study plan..." />
-      <button id="jasSend" class="jas-send" aria-label="Send">Send</button>
+    <div class="jchat" id="jchat"></div>
+    <div class="jsuggestions" id="jsugg"></div>
+    <div class="jinput-row">
+      <textarea class="jinp" id="jinp" placeholder="Type your question…" rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendJas();}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+      <button class="jsend" id="jsend" onclick="sendJas()">➤</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/static/script.js"></script>
+<!-- ════════════════════════════════
+     ANALYZER
+════════════════════════════════ -->
+<div id="page-analyzer" class="page">
+  <div class="aw">
+    <div class="pheader">
+      <h2>📊 Your Study Stats</h2>
+      <p>The honest numbers. No padding, no rounding up.</p>
+    </div>
+    <div class="an-cards">
+      <div class="ancard"><div class="ann" id="an1">–</div><div class="anl">Plans made</div></div>
+      <div class="ancard"><div class="ann" id="an2">–</div><div class="anl">Tasks done</div></div>
+      <div class="ancard"><div class="ann" id="an3">–</div><div class="anl">Study hours logged</div></div>
+      <div class="ancard"><div class="ann" id="an4">–</div><div class="anl">Focus score</div></div>
+    </div>
+    <div class="chart-box reveal">
+      <div class="chart-title">📅 Hours studied this week</div>
+      <div class="barchart" id="wchart"></div>
+    </div>
+    <div class="an-row">
+      <div class="chart-box reveal">
+        <div class="chart-title">🎯 Focus score</div>
+        <div class="ring-wrap">
+          <svg style="transform:rotate(-90deg)" width="130" height="130" viewBox="0 0 100 100">
+            <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#3273fa"/><stop offset="100%" stop-color="#7c3aed"/>
+            </linearGradient></defs>
+            <circle class="ring-bg" cx="50" cy="50" r="45"/>
+            <circle class="ring-fg" id="rfg" cx="50" cy="50" r="45"/>
+          </svg>
+          <div class="ring-center"><div class="ring-pct" id="rpct">–</div><div class="ring-sub">Focus</div></div>
+        </div>
+      </div>
+      <div class="chart-box reveal">
+        <div class="chart-title">📚 Time per subject</div>
+        <div class="act-list" id="alist"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL ── -->
+<div class="mbg" id="mbg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3>📅 New study plan</h3>
+    <div class="mrow"><label>Subject</label><input class="inp" id="ms" placeholder="e.g. Physics"/></div>
+    <div class="mrow"><label>Topic / Chapter</label><input class="inp" id="mt" placeholder="e.g. Thermodynamics"/></div>
+    <div class="mrow"><label>How long? (minutes)</label><input class="inp" type="number" id="md" placeholder="60" min="5" value="60"/></div>
+    <div class="mrow"><label>When?</label><input class="inp" type="date" id="mdt"/></div>
+    <div class="mrow"><label>Priority</label>
+      <select class="sel" id="mp" style="width:100%">
+        <option value="High">🔴 High — can't skip this</option>
+        <option value="Medium" selected>🟡 Medium — should do it</option>
+        <option value="Low">🟢 Low — nice to have</option>
+      </select>
+    </div>
+    <div class="mrow"><label>Notes (optional)</label><input class="inp" id="mn" placeholder="Anything to remember…"/></div>
+    <div class="mactions">
+      <button class="btn-cancel" onclick="closeModal()">Nah, cancel</button>
+      <button class="btn btn-primary" onclick="addPlan()">Add it →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   THREE.JS BACKGROUND
+═══════════════════════════════════════ */
+(()=>{
+  const c=document.getElementById('bg3d');
+  const r=new THREE.WebGLRenderer({canvas:c,antialias:true,alpha:true});
+  r.setPixelRatio(Math.min(devicePixelRatio,2));
+  r.setSize(innerWidth,innerHeight);
+  const sc=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,1000);
+  cam.position.z=32;
+
+  const N=1100,pos=new Float32Array(N*3),col=new Float32Array(N*3);
+  const pal=[new THREE.Color('#3273fa'),new THREE.Color('#7c3aed'),new THREE.Color('#05c98a'),new THREE.Color('#c0d4ff')];
+  for(let i=0;i<N;i++){
+    pos[i*3]=(Math.random()-.5)*135;pos[i*3+1]=(Math.random()-.5)*135;pos[i*3+2]=(Math.random()-.5)*85;
+    const p=pal[Math.floor(Math.random()*pal.length)];col[i*3]=p.r;col[i*3+1]=p.g;col[i*3+2]=p.b;
+  }
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  const pts=new THREE.Points(g,new THREE.PointsMaterial({size:.33,vertexColors:true,transparent:true,opacity:.68,sizeAttenuation:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+  sc.add(pts);
+
+  [[9,-19,11,-11],[5,22,-8,-5],[13,4,-17,-21]].forEach(([rad,x,y,z])=>{
+    const m=new THREE.Mesh(new THREE.SphereGeometry(rad,13,13),new THREE.MeshBasicMaterial({color:0x3273fa,wireframe:true,transparent:true,opacity:.055}));
+    m.position.set(x,y,z);sc.add(m);
+    const rx=Math.random()*.35-.17,ry=Math.random()*.35-.17;
+    (function sp(){requestAnimationFrame(sp);m.rotation.x+=rx*.0048;m.rotation.y+=ry*.0048;})();
+  });
+  const tor=new THREE.Mesh(new THREE.TorusGeometry(15,.048,8,96),new THREE.MeshBasicMaterial({color:0x7c3aed,transparent:true,opacity:.055}));
+  tor.rotation.x=Math.PI/4;sc.add(tor);
+
+  let mx=0,my=0;
+  document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=-(e.clientY/innerHeight-.5)*2;});
+  let t=0;
+  (function loop(){requestAnimationFrame(loop);t+=.007;
+    pts.rotation.y=t*.016;pts.rotation.x=t*.008;
+    tor.rotation.y+=.0009;tor.rotation.z+=.0005;
+    cam.position.x+=(mx*1.8-cam.position.x)*.016;
+    cam.position.y+=(my*1.8-cam.position.y)*.016;
+    cam.lookAt(sc.position);r.render(sc,cam);
+  })();
+  window.addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();r.setSize(innerWidth,innerHeight);});
+})();
+
+/* ═══════════════════════════════════════
+   ROUTING
+═══════════════════════════════════════ */
+const API = ''; // empty = same origin; set to full URL if different
+
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const idx=['home','planner','todo','jas','analyzer'].indexOf(id);
+  document.querySelectorAll('.nav-link')[idx]?.classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='analyzer')setTimeout(initAnalyzer,180);
+  if(id==='home')setTimeout(initHeroStats,280);
+  if(id==='jas'&&!jasInited)initJas();
+}
+window.addEventListener('scroll',()=>{const p=scrollY/(document.body.scrollHeight-innerHeight)*100;document.getElementById('sbar').style.width=p+'%';});
+
+/* reveal */
+const ro=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){const d=+e.target.dataset.d||0;setTimeout(()=>e.target.classList.add('vis'),d);ro.unobserve(e.target);}});},{threshold:.11});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+/* card tilt */
+document.querySelectorAll('.fcard').forEach(c=>{
+  c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect(),rx=(e.clientY-r.top-r.height/2)/r.height*-12,ry=(e.clientX-r.left-r.width/2)/r.width*12;c.style.transform=`perspective(680px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.03)`;});
+  c.addEventListener('mouseleave',()=>c.style.transform='');
+});
+
+/* toast */
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2700);
+}
+
+/* counter */
+function cnt(el,target){
+  let s=0;const dur=1700;
+  const step=ts=>{if(!s)s=ts;const p=Math.min((ts-s)/dur,1),e=1-Math.pow(1-p,3),v=Math.floor(e*target);
+    el.textContent=v>=10000?(v/1000).toFixed(0)+'K+':v>=1000?v.toLocaleString()+(p<1?'':'+'):v;
+    if(p<1)requestAnimationFrame(step);
+  };requestAnimationFrame(step);
+}
+
+function initHeroStats(){
+  cnt(document.getElementById('hs1'),10247);
+  cnt(document.getElementById('hs2'),84000);
+  document.getElementById('hs3').textContent='97%';
+}
+setTimeout(initHeroStats,350);
+
+const so=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('[data-target]').forEach(el=>cnt(el,+el.dataset.target));so.unobserve(e.target);}});},{threshold:.28});
+document.querySelectorAll('.sband-inner').forEach(el=>so.observe(el));
+
+/* ═══════════════════════════════════════
+   PLANNER  (talks to /api/plans)
+═══════════════════════════════════════ */
+let plans=[];
+
+async function loadPlans(){
+  try{const r=await fetch(API+'/api/plans');plans=await r.json();}
+  catch{plans=JSON.parse(localStorage.getItem('sp_plans')||'[]');}
+  renderPlans();
+}
+
+function openModal(){document.getElementById('mdt').value=new Date().toISOString().slice(0,10);document.getElementById('mbg').classList.add('open');}
+function closeModal(){document.getElementById('mbg').classList.remove('open');}
+
+async function addPlan(){
+  const s=document.getElementById('ms').value.trim();
+  const t=document.getElementById('mt').value.trim();
+  if(!s||!t){toast('Fill in the subject and topic first ✏️');return;}
+  const body={subj:s,topic:t,dur:+document.getElementById('md').value||60,date:document.getElementById('mdt').value,priority:document.getElementById('mp').value,notes:document.getElementById('mn').value.trim()};
+  try{
+    const r=await fetch(API+'/api/plans',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const p=await r.json();plans.unshift(p);
+  }catch{
+    const p={id:Date.now().toString(),...body,progress:0,done:false};
+    plans.unshift(p);localStorage.setItem('sp_plans',JSON.stringify(plans));
+  }
+  closeModal();renderPlans();toast('Plan added 📅');
+  ['ms','mt','mn'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('md').value=60;
+}
+
+function renderPlans(){
+  const g=document.getElementById('pgrid');
+  const fs=document.getElementById('fSubj').value.toLowerCase();
+  const fp=document.getElementById('fPri').value;
+  const fst=document.getElementById('fStat').value;
+  let f=plans.filter(p=>(!fs||p.subj.toLowerCase().includes(fs))&&(!fp||p.priority===fp)&&(!fst||(fst==='done'?p.done:!p.done)));
+  if(!f.length){g.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="ei">📭</div><p>No plans yet — add one above!</p></div>`;return;}
+  g.innerHTML=f.map(p=>{
+    const bc=p.priority==='High'?'ph':p.priority==='Medium'?'pm':'pl';
+    const pr=p.progress||0;
+    return`<div class="pcard">
+      <div class="pcard-top"><div class="pcard-subj">${x(p.subj)} ${p.done?'✅':''}</div><span class="pbadge ${bc}">${p.priority}</span></div>
+      <div class="pcard-topic">${x(p.topic)}</div>
+      ${p.notes?`<div class="pcard-notes">"${x(p.notes)}"</div>`:''}
+      <div class="pcard-meta"><span>⏱ ${p.dur}min</span><span>📅 ${p.date}</span></div>
+      <div class="pprog">
+        <div class="pprog-lbl"><span>Progress</span><span>${pr}%</span></div>
+        <div class="pprog-track"><div class="pprog-fill" style="width:${pr}%"></div></div>
+        <input type="range" min="0" max="100" value="${pr}" style="width:100%;margin-top:.5rem;accent-color:var(--accent);" oninput="updProg('${p.id}',this.value)"/>
+      </div>
+      <div class="pcard-actions">
+        <button class="bsm done-btn" onclick="togDone('${p.id}')">${p.done?'↩ Undo':'✅ Done'}</button>
+        <button class="bsm del" onclick="delPlan('${p.id}')">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function updProg(id,val){
+  const p=plans.find(q=>q.id===id);if(!p)return;
+  p.progress=+val;
+  try{await fetch(API+'/api/plans/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({progress:+val})});}
+  catch{localStorage.setItem('sp_plans',JSON.stringify(plans));}
+  renderPlans();
+}
+async function togDone(id){
+  const p=plans.find(q=>q.id===id);if(!p)return;
+  p.done=!p.done;if(p.done)p.progress=100;
+  try{await fetch(API+'/api/plans/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({done:p.done,progress:p.progress})});}
+  catch{localStorage.setItem('sp_plans',JSON.stringify(plans));}
+  renderPlans();toast(p.done?'Nice, plan done! 🎉':'Moved back to pending');
+}
+async function delPlan(id){
+  plans=plans.filter(p=>p.id!==id);
+  try{await fetch(API+'/api/plans/'+id,{method:'DELETE'});}
+  catch{localStorage.setItem('sp_plans',JSON.stringify(plans));}
+  renderPlans();toast('Deleted','err');
+}
+
+/* ═══════════════════════════════════════
+   TODO
+═══════════════════════════════════════ */
+let todos=[],tfMode='all';
+
+async function loadTodos(){
+  try{const r=await fetch(API+'/api/todos');todos=await r.json();}
+  catch{todos=JSON.parse(localStorage.getItem('sp_todos')||'[]');}
+  renderTodos();
+}
+function setTF(f,btn){tfMode=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTodos();}
+
+async function addTodo(){
+  const t=document.getElementById('tText').value.trim();
+  if(!t){toast('What\'s the task? ✏️');return;}
+  const cat=document.getElementById('tCat').value;
+  const body={text:t,cat};
+  try{const r=await fetch(API+'/api/todos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const td=await r.json();todos.unshift(td);}
+  catch{todos.unshift({id:Date.now().toString(),text:t,cat,done:false});localStorage.setItem('sp_todos',JSON.stringify(todos));}
+  document.getElementById('tText').value='';renderTodos();toast('Task added ✅');
+}
+function renderTodos(){
+  const l=document.getElementById('tlist');
+  const done=todos.filter(t=>t.done).length,total=todos.length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('tpLabel').textContent=total?`${done} of ${total} done`:'Nothing here yet — add a task!';
+  document.getElementById('tpPct').textContent=total?pct+'%':'–';
+  document.getElementById('tpFill').style.width=pct+'%';
+  let f=todos.filter(t=>tfMode==='all'?true:tfMode==='pending'?!t.done:tfMode==='done'?t.done:t.cat===tfMode);
+  if(!f.length){l.innerHTML=`<div class="todo-empty">Nothing here — add something above 📝</div>`;return;}
+  l.innerHTML=f.map(t=>`<div class="ti${t.done?' done':''}">
+    <div class="ti-check${t.done?' checked':''}" onclick="togTodo('${t.id}')">${t.done?'✓':''}</div>
+    <div class="ti-text">${x(t.text)}</div>
+    <span class="ti-cat">${t.cat}</span>
+    <button class="ti-del" onclick="delTodo('${t.id}')">✕</button>
+  </div>`).join('');
+}
+async function togTodo(id){
+  const t=todos.find(q=>q.id===id);if(!t)return;t.done=!t.done;
+  try{await fetch(API+'/api/todos/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({done:t.done})});}
+  catch{localStorage.setItem('sp_todos',JSON.stringify(todos));}
+  renderTodos();
+}
+async function delTodo(id){
+  todos=todos.filter(t=>t.id!==id);
+  try{await fetch(API+'/api/todos/'+id,{method:'DELETE'});}
+  catch{localStorage.setItem('sp_todos',JSON.stringify(todos));}
+  renderTodos();
+}
+
+/* ═══════════════════════════════════════
+   JAS AI
+═══════════════════════════════════════ */
+let jasMode='general',jasHist=[],jasInited=false;
+
+const modeIntros={
+  general:["Hey! I'm Jas 👋 Ask me anything — concepts, questions, what to study next, anything really.","Hey there! What are we studying today?","What's up! Hit me with your question."],
+  pcm:["PCM mode on ⚗️ Drop your Physics, Chemistry or Maths problem — I'll work through it step by step.","Ready to solve some PCM problems. What've you got?","PCM it is. What's the question?"],
+  doubt:["Doubt solver mode 🧩 What's confusing you? Describe it and I'll break it down.","What's the specific thing that's not clicking?","Okay, what's the doubt? Don't worry, all doubts are valid."],
+  wolfram:["Math mode 🔢 Give me the problem and I'll show you every step.","Ready to crunch numbers. What's the problem?","Hit me with the maths."]
+};
+
+const suggestions={
+  general:["Explain Newton's laws simply","How do I study effectively?","What is photosynthesis?","Help me make a revision plan"],
+  pcm:["Solve: x² + 5x + 6 = 0","Explain Ohm's Law","What is enthalpy?","Derive kinematic equations"],
+  doubt:["I don't understand integration","Why does light bend in water?","Confused about mole concept","Explain osmosis again"],
+  wolfram:["Differentiate x³ + 2x² + 5","Find area under y=x² from 0 to 3","Simplify (a+b)³","Solve 3x - 7 = 14"]
+};
+
+function setMode(m,btn){
+  jasMode=m;
+  document.querySelectorAll('.jmode').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  jasHist=[];document.getElementById('jchat').innerHTML='';
+  const intros=modeIntros[m];
+  appendMsg('ai',intros[Math.floor(Math.random()*intros.length)]);
+  renderSugg();
+}
+
+function renderSugg(){
+  const s=suggestions[jasMode]||[];
+  document.getElementById('jsugg').innerHTML=s.map(q=>`<button class="jchip" onclick="document.getElementById('jinp').value='${q.replace(/'/g,"\\'")}'">${q}</button>`).join('');
+}
+
+function initJas(){
+  jasInited=true;
+  appendMsg('ai',modeIntros.general[0]);
+  renderSugg();
+}
+
+function appendMsg(role,text,typing=false){
+  const chat=document.getElementById('jchat');
+  const d=document.createElement('div');
+  d.className=`msg ${role}`;
+  d.innerHTML=`<div class="mavatar ${role==='ai'?'ai':'usr'}">${role==='ai'?'🤖':'👤'}</div>
+    <div class="mbubble"><strong>${role==='ai'?'JAS':'YOU'}</strong>${typing?'<div class="typing-dots"><span></span><span></span><span></span></div>':fmt(text)}</div>`;
+  chat.appendChild(d);chat.scrollTop=chat.scrollHeight;return d;
+}
+function fmt(t){
+  return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>').replace(/•/g,'&bull;');
+}
+
+async function sendJas(){
+  const inp=document.getElementById('jinp');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
+  document.getElementById('jsend').disabled=true;
+  appendMsg('user',text);
+  jasHist.push({role:'user',content:text});
+  const typing=appendMsg('ai','',true);
+  try{
+    const r=await fetch(API+'/api/jas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:jasHist,mode:jasMode})});
+    const data=await r.json();
+    const reply=data.reply||data.error||'Something went wrong, try again.';
+    jasHist.push({role:'assistant',content:reply});
+    typing.querySelector('.mbubble').innerHTML=`<strong>JAS</strong>${fmt(reply)}`;
+    document.getElementById('jchat').scrollTop=document.getElementById('jchat').scrollHeight;
+  }catch{
+    typing.querySelector('.mbubble').innerHTML=`<strong>JAS</strong>Couldn't connect — are you online? 🌐`;
+  }
+  document.getElementById('jsend').disabled=false;
+}
+
+/* ═══════════════════════════════════════
+   ANALYZER
+═══════════════════════════════════════ */
+function initAnalyzer(){
+  const dp=plans.filter(p=>p.done).length;
+  const dt=todos.filter(t=>t.done).length;
+  const hours=plans.reduce((a,p)=>a+(p.progress/100)*(p.dur/60),0);
+  const focus=plans.length?Math.round(dp/plans.length*100):0;
+  document.getElementById('an1').textContent=plans.length||0;
+  document.getElementById('an2').textContent=dt||0;
+  document.getElementById('an3').textContent=hours.toFixed(1)+'h';
+  document.getElementById('an4').textContent=focus+'%';
+
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const hrs=[2.5,3.2,1.8,4.1,3.6,5.0,2.3];
+  const mx=Math.max(...hrs);
+  document.getElementById('wchart').innerHTML=days.map((d,i)=>`
+    <div class="bcol">
+      <div class="bval">${hrs[i]}h</div>
+      <div class="bfill" style="height:${(hrs[i]/mx)*128}px"></div>
+      <div class="blbl">${d}</div>
+    </div>`).join('');
+
+  const circ=2*Math.PI*45;
+  document.getElementById('rfg').style.strokeDashoffset=circ*(1-(focus||42)/100);
+  document.getElementById('rpct').textContent=(focus||42)+'%';
+
+  const subjs={};
+  plans.forEach(p=>{subjs[p.subj]=(subjs[p.subj]||0)+p.dur;});
+  if(!Object.keys(subjs).length){subjs['Mathematics']=120;subjs['Physics']=90;subjs['Chemistry']=75;subjs['English']=45;}
+  const ms=Math.max(...Object.values(subjs));
+  document.getElementById('alist').innerHTML=Object.entries(subjs).slice(0,5).map(([s,v])=>`
+    <div class="act-row">
+      <div class="act-lbl">${s}</div>
+      <div class="act-track"><div class="act-fill" style="width:${Math.round(v/ms*100)}%"></div></div>
+      <div class="act-val">${(v/60).toFixed(1)}h</div>
+    </div>`).join('');
+}
+
+/* ── INIT ── */
+function x(s){return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
+document.getElementById('mdt').value=new Date().toISOString().slice(0,10);
+loadPlans();
+loadTodos();
+</script>
 </body>
 </html>
